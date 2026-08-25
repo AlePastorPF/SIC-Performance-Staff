@@ -1,0 +1,20 @@
+{
+  "name": "sic-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Panel de Analisis del Rendimiento - San Isidro Club",
+  "scripts": {
+    "build": "python3 scripts/build.py",
+    "verify": "node scripts/verify_build.js"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "recharts": "^2.12.7",
+    "lucide-react": "^0.383.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.21.5",
+    "jsdom": "^24.1.0"
+  }
+}
