@@ -14,17 +14,17 @@ const WELLNESS_DATA = __WELLNESS_JSON__;
 const BUILD_TIMESTAMP = "__BUILD_TIMESTAMP__";
 
 const COLORS = {
-  bg: "#071019",
-  surface: "#0E1E2C",
-  surfaceAlt: "#152C3F",
-  line: "#1F3D52",
-  turf: "#2DD4BF",
-  turfDim: "#0E7490",
-  chalk: "#E8F6FA",
-  muted: "#7FA9C1",
-  amber: "#38BDF8",
-  red: "#F87171",
-  blue: "#60A5FA",
+  bg: "#F5F7FA",
+  surface: "#FFFFFF",
+  surfaceAlt: "#F1F5F9",
+  line: "#DDE3EA",
+  turf: "#0D9488",
+  turfDim: "#0F766E",
+  chalk: "#0F172A",
+  muted: "#64748B",
+  amber: "#D97706",
+  red: "#DC2626",
+  blue: "#2563EB",
 };
 
 const POS_ORDER = ["Pilar","Hooker","Segunda Linea","Tercera Linea","Medio Scrum","Apertura","Centro","Wing","Fullback","Utilidad","Sin dato"];
@@ -141,12 +141,12 @@ export default function Dashboard() {
 
   if (!unlocked) {
     return (
-      <div style={{ background: "#071019", minHeight: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "Inter, sans-serif" }}>
+      <div style={{ background: "#F5F7FA", minHeight: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "Inter, sans-serif" }}>
         <style>{`@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600&display=swap");`}</style>
-        <div style={{ background: "#0E1E2C", border: "1px solid #1F3D52", borderRadius: 14, padding: "36px 32px", width: "100%", maxWidth: 340, textAlign: "center", boxShadow: "0 12px 40px rgba(0,0,0,0.5)" }}>
+        <div style={{ background: "#FFFFFF", border: "1px solid #DDE3EA", borderRadius: 14, padding: "36px 32px", width: "100%", maxWidth: 340, textAlign: "center", boxShadow: "0 12px 40px rgba(15,23,42,0.12)" }}>
           <img src={LOGO_SRC} alt="San Isidro Club" style={{ height: 56, width: 56, objectFit: "contain", marginBottom: 16 }} />
-          <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "#2DD4BF", letterSpacing: "0.12em", marginBottom: 6 }}>SIC · RENDIMIENTO DEPORTIVO</div>
-          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 26, fontWeight: 700, margin: "0 0 20px", color: "#E8F6FA" }}>Acceso restringido</h1>
+          <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "#0D9488", letterSpacing: "0.12em", marginBottom: 6 }}>SIC · RENDIMIENTO DEPORTIVO</div>
+          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 26, fontWeight: 700, margin: "0 0 20px", color: "#0F172A" }}>Acceso restringido</h1>
           <input
             type="password"
             value={pwInput}
@@ -155,18 +155,18 @@ export default function Dashboard() {
             placeholder="Contraseña"
             autoFocus
             style={{
-              width: "100%", boxSizing: "border-box", background: "#152C3F", color: "#E8F6FA",
-              border: `1px solid ${pwError ? "#F87171" : "#1F3D52"}`, borderRadius: 8, padding: "11px 14px",
+              width: "100%", boxSizing: "border-box", background: "#F5F7FA", color: "#0F172A",
+              border: `1px solid ${pwError ? "#DC2626" : "#DDE3EA"}`, borderRadius: 8, padding: "11px 14px",
               fontSize: 14, fontFamily: "Inter, sans-serif", marginBottom: 12, outline: "none"
             }}
           />
           {pwError && (
-            <div style={{ color: "#F87171", fontSize: 12.5, marginBottom: 12, fontFamily: "Inter, sans-serif" }}>
+            <div style={{ color: "#DC2626", fontSize: 12.5, marginBottom: 12, fontFamily: "Inter, sans-serif" }}>
               Contraseña incorrecta. Probá de nuevo.
             </div>
           )}
           <button onClick={handleUnlock} style={{
-            width: "100%", background: "#2DD4BF", color: "#071019", border: "none", borderRadius: 8,
+            width: "100%", background: "#0D9488", color: "#FFFFFF", border: "none", borderRadius: 8,
             padding: "11px 14px", fontSize: 14, fontWeight: 700, fontFamily: "Inter, sans-serif", cursor: "pointer"
           }}>
             Ingresar
@@ -433,7 +433,7 @@ function DashboardContent() {
   };
 
   const NUTRI_MASA_COLS = ["Masa adiposa", "Masa muscular", "Masa Residual", "Masa ósea", "Masa de la piel"];
-  const NUTRI_MASA_COLORS = { "Masa adiposa": "#F87171", "Masa muscular": "#2DD4BF", "Masa Residual": "#94A3B8", "Masa ósea": "#38BDF8", "Masa de la piel": "#FACC15" };
+  const NUTRI_MASA_COLORS = { "Masa adiposa": "#DC2626", "Masa muscular": "#0D9488", "Masa Residual": "#64748B", "Masa ósea": "#2563EB", "Masa de la piel": "#D97706" };
   const nutriComposicionData = useMemo(() => {
     const source = nutriJugadorFilter.length === 1
       ? nutriUltimoPorJugador.filter(d => d.jugador === nutriJugadorFilter[0])
@@ -774,7 +774,7 @@ function DashboardContent() {
 
   const avgDistanciaPorFecha = useMemo(() => porFecha.length ? Math.round(porFecha.reduce((s, d) => s + d.distancia, 0) / porFecha.length) : 0, [porFecha]);
 
-  const SCATTER_PALETTE = ["#2DD4BF", "#38BDF8", "#818CF8", "#22D3EE", "#0EA5E9", "#67E8F9", "#60A5FA", "#5EEAD4", "#7DD3FC", "#A5F3FC", "#93C5FD"];
+  const SCATTER_PALETTE = ["#0D9488", "#2563EB", "#7C3AED", "#0891B2", "#0284C7", "#059669", "#DB2777", "#4F46E5", "#0EA5E9", "#65A30D", "#9333EA"];
   const puestosEnDatos = useMemo(() => POS_ORDER.filter(p => filteredCarga.some(d => d.puesto === p)), [filteredCarga]);
   const puestoColor = (puesto) => SCATTER_PALETTE[Math.max(0, puestosEnDatos.indexOf(puesto)) % SCATTER_PALETTE.length];
 
@@ -941,7 +941,7 @@ function DashboardContent() {
     return ref;
   }, [cargaDataClean]);
 
-  const RADAR_COLORS = [COLORS.turf, "#38BDF8", COLORS.blue, "#22D3EE", "#0EA5E9", "#67E8F9"];
+  const RADAR_COLORS = [COLORS.turf, "#2563EB", COLORS.blue, "#7C3AED", "#0891B2", "#DB2777"];
 
   const cargaRadarMode = jugadorFilter.length > 0 ? "jugador" : (puestoFilter.length > 0 ? "puesto" : "plantel");
   const cargaRadarGroups = useMemo(() => {
