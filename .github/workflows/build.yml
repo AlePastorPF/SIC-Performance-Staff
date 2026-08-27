@@ -1,0 +1,92 @@
+name: Actualizar dashboard
+
+# Se dispara solo cuando cambia algo relevante para el sitio, o manualmente desde la pestaña Actions.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "data/**"
+      - "assets/**"
+      - "template/**"
+      - "scripts/**"
+      - "package.json"
+  workflow_dispatch: {}
+
+# Permisos necesarios para: (a) commitear el index.html actualizado, y (b) publicarlo en GitHub Pages
+# directamente desde este mismo workflow (no dependemos de que Pages "note" el commit por su cuenta,
+# porque un commit hecho con GITHUB_TOKEN no dispara el build automático de Pages).
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias de Python
+        run: pip install -r scripts/requirements.txt
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Instalar dependencias de Node
+        run: npm install --no-audit --no-fund
+
+      - name: Generar el sitio (index.html)
+        run: python3 scripts/build.py
+
+      - name: Verificar que el sitio generado funciona (smoke test)
+        run: npm run verify
+
+      - name: Preparar carpeta pública (solo lo que debe verse en el sitio)
+        run: |
+          mkdir -p _site
+          cp index.html _site/
+
+      - name: Preparar el artefacto para GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "_site"
+
+      # Este paso es solo para tener historial en git de cada actualización de datos.
+      # NO es necesario para que el sitio se publique (eso ya lo garantiza el artefacto de arriba),
+      # así que si falla por una carrera con otro push simultáneo, no debe tumbar el despliegue.
+      - name: Commitear index.html si cambió (para tener el historial, no bloqueante)
+        continue-on-error: true
+        run: |
+          git config user.name "sic-dashboard-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "index.html no cambió, nada que commitear."
+          else
+            git commit -m "Actualizar dashboard automáticamente [skip ci]"
+            git pull --rebase origin main || true
+            git push
+          fi
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publicar en GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
