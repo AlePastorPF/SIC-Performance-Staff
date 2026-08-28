@@ -301,6 +301,43 @@ function DashboardContent() {
 
   const nutriExtraCols = useMemo(() => nutriColumns.filter(c => !["jugador", "fecha", "temporada", "puesto"].includes(c)), [nutriColumns]);
 
+  // Orden de la tabla "Registros de Nutrición" — funciona para cualquier columna, fija o dinámica.
+  const [nutriSortCol, setNutriSortCol] = useState(null);
+  const [nutriSortDir, setNutriSortDir] = useState("asc");
+  const toggleNutriSort = (col) => {
+    if (nutriSortCol === col) {
+      setNutriSortDir(d => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setNutriSortCol(col);
+      setNutriSortDir("asc");
+    }
+  };
+  const parseFechaDDMMYYYY = (f) => {
+    if (!f) return null;
+    const parts = String(f).split("/");
+    if (parts.length !== 3) return null;
+    const [dd, mm, yy] = parts.map(Number);
+    return new Date(yy, mm - 1, dd);
+  };
+  const sortedNutri = useMemo(() => {
+    if (!nutriSortCol) return filteredNutri;
+    const dir = nutriSortDir === "asc" ? 1 : -1;
+    return [...filteredNutri].sort((a, b) => {
+      const va = a[nutriSortCol], vb = b[nutriSortCol];
+      if (nutriSortCol === "fecha") {
+        const da = parseFechaDDMMYYYY(va), db = parseFechaDDMMYYYY(vb);
+        if (!da && !db) return 0;
+        if (!da) return 1;
+        if (!db) return -1;
+        return (da - db) * dir;
+      }
+      const na = parseFloat(va), nb = parseFloat(vb);
+      const bothNumeric = va !== "" && vb !== "" && !isNaN(na) && !isNaN(nb);
+      if (bothNumeric) return (na - nb) * dir;
+      return String(va ?? "").localeCompare(String(vb ?? ""), "es") * dir;
+    });
+  }, [filteredNutri, nutriSortCol, nutriSortDir]);
+
   // ---- Bienestar ----
   const [jugadorFilterW, setJugadorFilterW] = useState("Todos");
   const [fechaFilterW, setFechaFilterW] = useState("Todos");
@@ -2217,12 +2254,26 @@ function DashboardContent() {
                   <table>
                     <thead>
                       <tr style={{ color: COLORS.muted, borderBottom: `1px solid ${COLORS.line}`, textTransform: "uppercase", fontSize: 10, letterSpacing: "0.04em" }}>
-                        <th>Jugador</th><th>Fecha</th><th>Temporada</th><th>Puesto</th>
-                      {nutriExtraCols.map(c => <th key={c}>{c === "IM/O" ? "IMO" : c}</th>)}
+                        {[["jugador", "Jugador"], ["fecha", "Fecha"], ["temporada", "Temporada"], ["puesto", "Puesto"]].map(([key, label]) => (
+                          <th key={key} onClick={() => toggleNutriSort(key)} style={{ cursor: "pointer", userSelect: "none", whiteSpace: "nowrap" }} title="Ordenar">
+                            {label}
+                            <span style={{ marginLeft: 4, opacity: nutriSortCol === key ? 1 : 0.25 }}>
+                              {nutriSortCol === key ? (nutriSortDir === "asc" ? "▲" : "▼") : "▲▼"}
+                            </span>
+                          </th>
+                        ))}
+                        {nutriExtraCols.map(c => (
+                          <th key={c} onClick={() => toggleNutriSort(c)} style={{ cursor: "pointer", userSelect: "none", whiteSpace: "nowrap" }} title="Ordenar">
+                            {c === "IM/O" ? "IMO" : c}
+                            <span style={{ marginLeft: 4, opacity: nutriSortCol === c ? 1 : 0.25 }}>
+                              {nutriSortCol === c ? (nutriSortDir === "asc" ? "▲" : "▼") : "▲▼"}
+                            </span>
+                          </th>
+                        ))}
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredNutri.map((r, i) => (
+                    {sortedNutri.map((r, i) => (
                       <tr key={i} style={{ borderBottom: `1px solid ${COLORS.line}` }}>
                         <td style={{ fontWeight: 500 }}>{r.jugador}</td>
                         <td style={{ color: COLORS.muted, fontFamily: "'JetBrains Mono', monospace", fontSize: 10.5 }}>{r.fecha}</td>
